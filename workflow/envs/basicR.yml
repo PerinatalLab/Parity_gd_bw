@@ -1,0 +1,18 @@
+name: basicR
+channels:
+    - bioconda
+    - conda-forge
+    - eikematthias
+dependencies:
+    - r-dplyr=1.0.10
+    - r-data.table=1.14.2
+    - r-base=4.1.1
+    - r-tidyr=1.2.0
+    - r-ggplot2=3.4.0
+    - r-lubridate=1.9.0
+    - r-r.utils=2.12.2
+    - r-ranger=0.15.1
+    - r-ggrepel=0.9.3
+    - r-tableone=0.13.2
+    - r-ggstance=0.3.6
+    - r-patchwork=1.1.2

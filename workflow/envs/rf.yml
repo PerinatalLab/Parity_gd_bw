@@ -1,0 +1,14 @@
+name: rf
+channels:
+    - bioconda
+    - conda-forge
+dependencies:
+    - r-data.table 
+    - r-base
+    - r-dplyr
+    - r-tidyr
+    - r-ggplot2
+    - r-r.utils
+    - r-ranger
+    - r-mlr3verse
+    - r-progressr

@@ -1,0 +1,9 @@
+# This file contains everything to configure the workflow on a global scale
+
+sample: "config/family_members.list"
+chrom_list: "config/chrom.list"
+parity: "config/parity.list"
+allgwasoutputs: "config/allgwasoutputs.list"
+motherorchild: "config/motherorchild.list"
+features: "config/features.list"
+phenotypes: "config/pheno.list"

@@ -1,0 +1,27 @@
+# The main entry point of the workflow.
+
+
+rule all:
+    input:
+        "results/checks/phenotype_performed.txt", 
+        "results/checks/GWAS_performed.txt",
+        "results/checks/qc_GWAS_performed.txt",
+        "results/checks/figures_created.txt",
+        "results/checks/figures_created_fertility.txt",
+        "results/checks/herritability_and_correlation_estimated.txt",
+#        "results/checks/rf_format_performed.txt",
+#        "results/checks/rf_allpgs_performed.txt",
+        "results/checks/rf_downstream_performed.txt",
+	"results/work/GWAS/ldsc_all_to_all_correlation.txt"
+
+
+include: "rules/common.smk"
+include: "rules/phenotype.smk"
+include: "rules/GWAS.smk"
+include: "rules/qc_GWAS.smk"
+include: "rules/figures.smk"
+include: "rules/sensitivity_analysis/first_vs_second_preg.smk"
+include: "rules/h2_corr.smk"
+include: "rules/rf_prep.smk"
+include: "rules/rf.smk"
+include: "rules/rf_downstream.smk"

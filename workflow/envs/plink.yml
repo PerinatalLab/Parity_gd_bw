@@ -1,0 +1,6 @@
+name: plink
+channels:
+    - bioconda
+    - conda-forge
+dependencies: 
+    - plink2=2.00a3.3
