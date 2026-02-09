@@ -13,7 +13,7 @@ colnames(pheno) = c("IID","outcome")
 
 dat = inner_join(pheno, covar, by = "IID") # merge 
 
-if (outcome == "gd" | outcome == "gd_noPTDs") {
+if (outcome == "gd") {
 	myVars = c("outcome", "maternalage","KJONN","genotyping_chip") # Vector of variables to summarize
 	catVars = c("KJONN","genotyping_chip") # Vector of categorical variables 
 	nonnormalVar = c("outcome", "maternalage") # Summarizing nonnormal variables (median)
@@ -30,9 +30,9 @@ if (outcome == "gd" | outcome == "gd_noPTDs") {
         tab3Mat = print(tab3, nonnormal = nonnormalVar, formatOptions = list(big.mark = ","), howAllLevels = TRUE,quote = TRUE, noSpaces = TRUE, printToggle = FALSE)
 
 } else {
-	myVars = c("outcome", "pregnancy_duration","sex","genotyping_chip") # Vector of variables to summarize
-	catVars = c("sex","genotyping_chip") # Vector of categorical variables 
-	nonnormalVar = c("outcome", "pregnancy_duration") # Summarizing nonnormal variables (median)
+	myVars = c("outcome", "maternalage","SVLEN_DG","KJONN","genotyping_chip") # Vector of variables to summarize
+	catVars = c("KJONN","genotyping_chip") # Vector of categorical variables 
+	nonnormalVar = c("outcome", "SVLEN_DG","maternalage") # Summarizing nonnormal variables (median)
 	
 	tab3 = CreateTableOne(vars = myVars, strata = "parity" , data = dat, factorVars = catVars) # Create a TableOne object, parity summary
 	tab3Mat = print(tab3, nonnormal = nonnormalVar, formatOptions = list(big.mark = ","), howAllLevels = TRUE,quote = TRUE, noSpaces = TRUE, printToggle = FALSE)

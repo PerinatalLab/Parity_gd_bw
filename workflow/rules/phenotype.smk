@@ -3,7 +3,12 @@
 rule clean_pheo_bw:
     'Cleaning mfr and only include individuals in the genotype data passing QC - birth weight'
     input:
-        "/mnt/archive/moba/pheno/v12/pheno_anthropometrics_24-01-16/mfr.gz",
+        "/mnt/work/p1724/v12/PDB1724_MFR_541_v12.csv",
+        "/mnt/work/p1724/v12/20221205_DODKAT_breastmilk/20221205_PDB1724_MFR_541_v12.csv",
+        "/mnt/work/p1724/v12/parental_ID_to_PREG_ID.csv",
+        "/mnt/work/p1724/v12/linkage_Mother_PDB1724.csv",
+        "/mnt/work/p1724/v12/linkage_Child_PDB1724.csv",
+        "/mnt/work/p1724/v12/linkage_Father_PDB1724.csv",
         "/mnt/archive/moba/geno/MobaPsychgenReleaseMarch23/MoBaPsychGen_v1/MoBaPsychGen_v1-ec-eur-batch-basic-qc-cov-noMoBaIDs.txt"
 
     output:
@@ -208,6 +213,7 @@ rule prep_covar_pheno:
         dat = pd.merge(dat, unrelated, how ="inner", on = "IID" )
         dat.fillna("NA", inplace = True)
 
+
         if str(wildcards.pheno) == "gd":
         
             dat.rename(columns = {"SVLEN_DG":"gd"}, inplace= True)
@@ -228,15 +234,19 @@ rule prep_covar_pheno:
             dat.to_csv(output[8], sep="\t", header = True, index = False, columns = ["FID","IID","gd"])
        
         else:
-        
+            dat["parity"] = np.where(dat.PARITET_5 == 0,0,1)
+
+            datp0 = dat.loc[dat.PARITET_5 == 0,:]
+            datp1 = dat.loc[dat.PARITET_5 >= 1,:]
+
             datp0 = dat.loc[dat.parity == 0,:]
             datp1 = dat.loc[dat.parity == 1,:]
 
-            dat.to_csv(output[2], sep="\t", header = True, index = False, columns = ["FID","IID", "parity","sex", "genotyping_chip","pregnancy_duration","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
+            dat.to_csv(output[2], sep="\t", header = True, index = False, columns = ["FID","IID", "parity","KJONN", "genotyping_chip","maternalage","SVLEN_DG","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
             dat.to_csv(output[5], sep="\t", header = True, index = False, columns = ["FID","IID"])
-            datp0.to_csv(output[0], sep="\t", header = True, index = False, columns = ["FID","IID", "sex", "genotyping_chip","pregnancy_duration","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
+            datp0.to_csv(output[0], sep="\t", header = True, index = False, columns = ["FID","IID", "KJONN", "genotyping_chip","maternalage","SVLEN_DG","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
             datp0.to_csv(output[3], sep="\t", header = True, index = False, columns = ["FID","IID"])
-            datp1.to_csv(output[1], sep="\t", header = True, index = False, columns = ["FID","IID","sex", "genotyping_chip","pregnancy_duration","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
+            datp1.to_csv(output[1], sep="\t", header = True, index = False, columns = ["FID","IID","KJONN", "genotyping_chip","maternalage","SVLEN_DG","PC1_AVG","PC2_AVG","PC3_AVG","PC4_AVG","PC5_AVG","PC6_AVG","PC7_AVG","PC8_AVG","PC9_AVG","PC10_AVG"])
             datp1.to_csv(output[4], sep="\t", header = True, index = False, columns = ["FID","IID"])
             datp0.to_csv(output[6], sep="\t", header = True, index = False, columns = ["FID","IID",str(wildcards.pheno)])
             datp1.to_csv(output[7], sep="\t", header = True, index = False, columns = ["FID","IID",str(wildcards.pheno)])
