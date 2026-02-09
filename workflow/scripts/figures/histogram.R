@@ -2,10 +2,6 @@ library(dplyr)
 library(data.table)
 library(ggplot2)
 
-#dat0 = fread("/mnt/scratch/karin/Parity_gd_bw_pw/results/work/clean_phenotypes/gd/mother/parity0_phenofile.txt")
-#dat1 = fread("/mnt/scratch/karin/Parity_gd_bw_pw/results/work/clean_phenotypes/gd/mother/parity1_phenofile.txt")
-#datall = fread("/mnt/scratch/karin/Parity_gd_bw_pw/results/work/clean_phenotypes/gd/mother/parityall_phenofile.txt")
-
 dat0 = fread(snakemake@input[[1]])
 dat1 = fread(snakemake@input[[2]])
 datall = fread(snakemake@input[[3]])
@@ -62,6 +58,5 @@ p = ggplot(datall, aes(x = gd)) +
         
   )
 
-#ggsave("/mnt/scratch/karin/Parity_gd_bw/histogram_gd.png",p,width = 190, height = 140, dpi = 1200, units = "mm")
 ggsave(snakemake@output[[1]],p,width = 190, height = 140, dpi = 1200, units = "mm")
 
