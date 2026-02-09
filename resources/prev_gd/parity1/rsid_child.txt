@@ -1,0 +1,2 @@
+CHROM   GENPOS  ID
+3       123052990       rs12634663
