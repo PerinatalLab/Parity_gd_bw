@@ -1,5 +1,23 @@
 ##### Figures from genome-wide association study #####
 
+rule histogram:
+    'histogram'
+    input:
+        "results/work/clean_phenotypes/{pheno}/{motherorchild}/parity0_phenofile.txt",
+        "results/work/clean_phenotypes/{pheno}/{motherorchild}/parity1_phenofile.txt",
+        "results/work/clean_phenotypes/{pheno}/{motherorchild}/parityall_phenofile.txt"
+
+    output:
+        "results/figures/{pheno}/{motherorchild}/histogram.png"
+
+    conda:
+        "../envs/basicR.yml"
+
+    script:
+        "../scripts/figures/histogram.R" 
+
+
+
 rule qqplot:
     'qq-plot'
     input:
