@@ -14,16 +14,16 @@ if (grepl("mother", snakemake@input[[1]])) {
 }
 
 
-datall$group = ifelse(datall$IID %in% dat0$IID, "parity = zero", "parity > zero")
+datall$Parity = ifelse(datall$IID %in% dat0$IID, "Nulliparous", "Multiparous")
 
 p = ggplot(datall, aes(x = gd)) +
   geom_histogram(
-    aes(fill = group),
+    aes(fill = Parity),
     bins = 150,
     alpha = 0.5,
     position = "identity"
   ) +
-  scale_fill_manual(values=c("#7b3294", "#008837")) +
+  scale_fill_manual(values=c("#008837","#7b3294")) +
   geom_histogram(
     bins = 150,
     fill = "black",

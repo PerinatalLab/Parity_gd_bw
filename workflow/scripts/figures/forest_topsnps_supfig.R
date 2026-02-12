@@ -78,8 +78,8 @@ if (length(unique(aa$ID)) == 0) {
 			) +
 		scale_y_discrete(breaks= new_order, labels=gsub("\\..*", "", new_order),element_text(size = 8, color = "black", face = "italic")) +
   		geom_text(aes(x=Inf,label=as.numeric(PVALUE2)),size=3.5, hjust = 1, color="black") +
-  		scale_shape_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
-  		scale_fill_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
+  		scale_shape_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
+  		scale_fill_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
 
 	########### Save figure ###########
 	ggsave(snakemake@output[[1]],pp, width = 174, height = 260, dpi = 1200, units = "mm")
@@ -139,8 +139,8 @@ if (length(unique(aa$ID)) == 0) {
 			) +
 		scale_y_discrete(breaks= new_order, labels=gsub("\\..*", "", new_order),element_text(size = 9, color = "black", face = "italic")) +
   		geom_text(aes(x=Inf,label=as.numeric(PVALUE2)),size=5, hjust = 1, color="black") +
-  		scale_shape_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
-  		scale_fill_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
+  		scale_shape_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
+  		scale_fill_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
 
 	########### Save figure ###########
 	ggsave(snakemake@output[[1]],pp, width = 350, height = 260, dpi = 800, units = "mm")

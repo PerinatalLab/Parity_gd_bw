@@ -106,8 +106,8 @@ p = aa %>%
         legend.background = element_rect(colour = "transparent", fill = "transparent")
         ) +
   #scale_x_continuous(breaks = seq(floor(min(aa$r2)), ceiling(max(aa$r2)),by = 0.005)) +
-  scale_shape_manual(labels=c("> zero","zero"),values=c(22, 21), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) +
-  scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("> zero","zero"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
+  scale_shape_manual(labels=c("Multiparous","Nulliparous"),values=c(22, 21), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) +
+  scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("Multiparous","Nulliparous"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))
 
 if (max(aa$r2)>0.1 ) {
 	p = p + scale_x_continuous(breaks = seq(floor(min(aa$r2)), ceiling(max(aa$r2)),by = 0.05)) 

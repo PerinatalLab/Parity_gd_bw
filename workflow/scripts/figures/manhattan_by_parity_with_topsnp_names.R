@@ -120,7 +120,7 @@ p1.final = p1 + geom_text_repel(dat = filter(don, Gene!= ""), aes(x = BPcum, y =
                   xlim = c(0.05, Inf),
                   arrow=arrow(angle=20, length=unit(0.02, "npc")) 
 		  ) +
-             annotate("text", x =c(150000000,150000000), y = c(text_position_top,text_position_bottom), label= c("Parity = 0", "Parity > 0"), size=8/.pt, color = "grey34" ) + 
+             annotate("text", x =c(150000000,150000000), y = c(text_position_top,text_position_bottom), label=c("Nulliparous", "Multiparous"), size=8/.pt, color = "grey34" ) + 
 	     theme(plot.margin = unit(c(t=0, r=0, b=0.5, l=0), 'cm'), 
 		   panel.background = element_rect(fill = "transparent", colour = NA),
 		   plot.background = element_rect(fill = "transparent", colour = NA)

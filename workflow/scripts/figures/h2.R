@@ -81,8 +81,8 @@ p = aa %>%
         legend.key = element_rect(colour = "transparent", fill = "transparent"),
         legend.background = element_rect(colour = "transparent", fill = "transparent")
         ) +
-  scale_shape_manual(labels=c("> zero","zero"),values=c(22, 21), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) +
-  scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("> zero","zero"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
+  scale_shape_manual(labels=c("Multiparous","Nulliparous"),values=c(22, 21), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) +
+  scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("Multiparous","Nulliparous"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
   geom_text(aes(x=Inf,label=gc),size=2.5, hjust = 1, color="black")
 
 

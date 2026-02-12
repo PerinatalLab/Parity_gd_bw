@@ -66,8 +66,8 @@ create_facet_plot = function(data, genome_val, outcome_val,x_label) {
     geom_errorbarh(aes(xmin = clmin2, xmax = clmax2),height = 0) +
     geom_point(pch = 21, size = 3, fill = "#f1a340", color = "black") +
     ggtitle(paste(genome_val,outcome_val, sep ="\n") ) +
-    xlab(paste("Effect size (Parity = one), previous delivery in model", x_label, sep="\n")) +
-    ylab("Effect size (Parity = one), no previous delivery in model") +
+    xlab(paste("Effect size - previous delivery in model", x_label, sep="\n")) +
+    ylab("Effect size - previous delivery not in model") +
     geom_hline(yintercept = 0, alpha = .5, color = "black") +
     geom_vline(xintercept = 0, alpha = .5, color = "black") +
     coord_cartesian(xlim = final_range, ylim = final_range) +

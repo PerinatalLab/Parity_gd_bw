@@ -88,8 +88,8 @@ pp = aa %>%
 	    label = as.numeric(PVALUE2), 
             fontface = ifelse(PVALUE2 <= 5e-04, "bold", "plain")),
 	    size=4, hjust = 1, color="black") +
-  scale_shape_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
-  scale_fill_manual(labels=c("Parity > 0" ="> zero","Parity 0" = "zero"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) + coord_cartesian(clip = "off") 
+  scale_shape_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"), values = c(22, 21),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
+  scale_fill_manual(labels=c("Parity > 0" ="Multiparous","Parity 0" = "Nulliparous"),values = c("#7b3294", "#008837"), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) + coord_cartesian(clip = "off") 
 
 
 

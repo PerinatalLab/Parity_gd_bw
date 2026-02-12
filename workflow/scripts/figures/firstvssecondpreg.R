@@ -10,8 +10,8 @@ df.2 = df.2 %>% mutate(color = ifelse(abs(Estimate1)>abs(Estimate2) ,0,1)) # Col
 
 correlation = round(cor(df.2$Estimate1, df.2$Estimate2, method = 'pearson', use="complete.obs"),digits =2)
 P2 = ggplot(df.2, aes(x=Estimate1, y=Estimate2,color=as.factor(color))) +
-  xlab(paste("Effect size, only Parity = zero","Days (95% CI)",sep="\n")) +
-  ylab(paste("Effect size, only Parity = one","Days (95% CI)",sep="\n")) +
+  xlab(paste("Effect size in first pregnancy","Days (95% CI)",sep="\n")) +
+  ylab(paste("Effect size in second pregancy","Days (95% CI)",sep="\n")) +
   geom_abline(slope = 1,intercept =0, color = "red", linetype = "dashed")  +
   geom_vline(xintercept = 0) + geom_hline(yintercept = 0) +
   scale_x_continuous(breaks = seq(-3.5,3.5, by = 0.5)) +

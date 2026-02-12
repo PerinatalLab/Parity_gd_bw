@@ -66,8 +66,8 @@ create_facet_plot = function(data, genome_val, outcome_val,x_label) {
         geom_errorbarh(aes(xmin = CImin0, xmax = CImax0),height = 0) +
 	geom_point(pch = 21, size = 3, fill = "#f1a340", color = "black") +
 	ggtitle(paste(genome_val,outcome_val, sep ="\n") ) +
-	xlab(paste("Effect size (Parity = zero)", x_label, sep="\n")) +
-        ylab("Effect size (Parity > zero)") +
+	xlab(paste("Effect size (Nulliparous)", x_label, sep="\n")) +
+        ylab("Effect size (Multiparous)") +
         geom_hline(yintercept = 0, alpha = .5, color = "black") +
         geom_vline(xintercept = 0, alpha = .5, color = "black") +
         coord_cartesian(xlim = final_range, ylim = final_range) +
