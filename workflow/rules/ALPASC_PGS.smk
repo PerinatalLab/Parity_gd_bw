@@ -41,8 +41,8 @@ rule format_sumstats:
 		'../envs/Rbase.yml'
 	shell:
 		'''
-		chmod +x ./workflow/scripts/PRScs/format_sumstats.R
-		Rscript --vanilla ./workflow/scripts/PRScs/format_sumstats.R \
+		chmod +x ./workflow/scripts/ALSPAC_PGS/format_sumstats.R
+		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/format_sumstats.R \
       --gwas {input[0]}  \
       --gwas_format {output[0]} \
       >& {log[0]}
@@ -70,8 +70,8 @@ rule PRScs:
     '../envs/PRS-CS.yml'
   shell:
     """
-    chmod +x ./workflow/scripts/PRScs/PRS-CS.sh
-    ./workflow/scripts/PRScs/PRS-CS.sh {params.ld_ref}  {input.sumstats}  {input.gwas}  {params.out_prefix} {params.bim} {params.ichr} {input.code} &> {log} 
+    chmod +x ./workflow/scripts/ALSPAC_PGS/PRS-CS.sh
+    ./workflow/scripts/ALSPAC_PGS/PRS-CS.sh {params.ld_ref}  {input.sumstats}  {input.gwas}  {params.out_prefix} {params.bim} {params.ichr} {input.code} &> {log} 
     """		
 
 rule PGS_parity0:
@@ -203,7 +203,7 @@ rule concat_PGS:
 	shell:
 	  '''
 	  chmod +x ./workflow/scripts/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
+		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
       > {log} 2>&1
@@ -298,8 +298,8 @@ rule concat_PGS_parity0toall:
 		'../envs/Rbase.yml'
 	shell:
 	  '''
-	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
+	  chmod +x ./workflow/scripts/ALSPAC_PGS/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
       > {log} 2>&1
@@ -319,8 +319,8 @@ rule concat_PGS_parity1toall:
 		'../envs/Rbase.yml'
 	shell:
 	  '''
-	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
+	  chmod +x ./workflow/scripts/ALSPAC_PGS/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
       > {log} 2>&1
