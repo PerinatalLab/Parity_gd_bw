@@ -17,10 +17,10 @@ qc_geno = fread(snakemake@input[[6]])
 ########### Child or mother ########### 
 if (grepl("mother", snakemake@input[[7]])) {
   motherorchild = "mother"
-  cat("Preparing the data for maternal genome and the mothers previous gd")
+  cat("Preparing the data for maternal genome and the mothers previous bw")
 } else if (grepl("child", snakemake@input[[7]])) {
   motherorchild = "child"
-  cat("Preparing the data for fetal genome and the mothers previous gd")
+  cat("Preparing the data for fetal genome and the mothers previous bw")
 } 
 
 
@@ -135,7 +135,7 @@ listheader = list(for_header0,for_header1,for_headerall)
 for (i in 1:length(listdosage)) {
   dat_dosage =  listdosage[[i]]
   for_header = listheader[[i]]
-  dat_dosage$RSID = for_header %>% arrange(CHROM,GENPOS) %>% pull(ID)
+  dat_dosage$RSID = for_header %>% arrange(CHROM,GENPOS) %>% pull(nearestGene)
   colnam = dat_dosage$RSID
   dat_dosage = dat_dosage %>% select(-c("#CHROM","POS","REF","ALT","RSID"))
   dat_dosage = t(dat_dosage)
@@ -194,7 +194,8 @@ for (i in 1:(ncol(dat_dosage)-1)){
   
   variablesofinterest = c(paste(rsid), "bw1")
   coefficients = summary(fit)$coefficients
-  tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+  tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+  colnames(tosave) = c("Estimate","clmin","clmax")
   tosave$rsid = rsid
   tosave$n = length(fit$residuals)
   tosave$model = "With previous bw"
@@ -213,7 +214,8 @@ for (i in 1:(ncol(dat_dosage)-1)){
   
   variablesofinterest = c(paste(rsid), "sex2")
   coefficients = summary(fit)$coefficients
-  tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+  tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+  colnames(tosave) = c("Estimate","clmin","clmax")
   tosave$rsid = rsid
   tosave$n = length(fit$residuals)
   tosave$model = "No previous bw"
@@ -231,11 +233,75 @@ names(y) = paste0(names(y), "2")
 
 df =cbind(x,y)
 
-df$clmin1 = as.numeric(df$Estimate1-(df$`Std. Error1`*1.96))
-df$clmax1 = as.numeric(df$Estimate1+(df$`Std. Error1`*1.96))
-df$clmin2 = as.numeric(df$Estimate2-(df$`Std. Error2`*1.96))
-df$clmax2 = as.numeric(df$Estimate2+(df$`Std. Error2`*1.96))
-
-
-#### Save data #### 
 fwrite(df, snakemake@output[[1]], sep = "\t")
+
+
+#### Prep data for first vs second pregnancy ####
+if (motherorchild == "mother") {
+  results = data.frame()
+  for (i in 1:(ncol(dat_dosage)-1)){
+    cat("Regressions for: ",colnames(dat_dosage)[i+1],"\n")
+    dat_snp = dat_dosage[,c(1,i+1)]
+    rsid = colnames(dat_dosage)[i+1]
+    covar.i = inner_join(covar, dat_snp, by="IID")
+
+    formula = as.formula(
+      paste(
+        "bw1 ~ sex1 + genotyping_chip + ma1 +",
+        "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
+        "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG  +",
+        rsid
+      )
+    )
+
+    fit = lm(formula, data = covar.i,)
+
+    variablesofinterest = c(paste(rsid), "sex1")
+    coefficients = summary(fit)$coefficients
+    tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+    colnames(tosave) = c("Estimate","clmin","clmax")
+    tosave$rsid = rsid
+    tosave$n = length(fit$residuals)
+    tosave$model = "Parity = zero"
+    results = rbind(results,tosave)
+
+    formula = as.formula(
+      paste(
+        "bw2 ~ sex2 + genotyping_chip + ma2 +",
+        "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
+        "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG +",
+        rsid
+      )
+    )
+
+    fit = lm(formula, data = covar.i)
+
+    variablesofinterest = c(paste(rsid), "sex2")
+    coefficients = summary(fit)$coefficients
+    tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+    colnames(tosave) = c("Estimate","clmin","clmax")
+    tosave$rsid = rsid
+    tosave$n = length(fit$residuals)
+    tosave$model = "Parity = one"
+    results = rbind(results,tosave)
+
+  }
+
+
+
+  toplot = results[!grepl("sex", rownames(results)), ]
+
+  x= toplot[toplot$model == "Parity = zero",]
+  names(x) = paste0(names(x), "1")
+  y= toplot[toplot$model == "Parity = one",]
+  names(y) = paste0(names(y), "2")
+
+  df.2 =cbind(x,y)
+
+  fwrite(df.2, snakemake@output[[2]], sep = "\t")
+  cat("An additional file was saved for plotting first vs second pregnancy SNP effects in mothers with two pregnancies in MoBa")
+} else {
+  df.2 = data.frame()
+  fwrite(df.2, snakemake@output[[2]], sep = "\t")
+}
+

@@ -72,7 +72,6 @@ rule prep_mfr_gd_child:
     output:
         "resources/forfigs/gd/child_prev.csv"
 
-
     conda: 
         "../envs/basicR.yml"
 
@@ -121,7 +120,9 @@ rule prep_mfr_bw:
         "results/work/clean_phenotypes/bw_zscore/{childormother}/parityall_covar.txt"
 
     output:
-        "resources/forfigs/bw_zscore/{childormother}_prev.csv"
+        "resources/forfigs/bw_zscore/{childormother}_prev.csv",
+        "resources/forfigs/bw_zscore/{childormother}_firstvssecond.csv"
+
 
     conda:
         "../envs/basicR.yml"

@@ -133,7 +133,7 @@ listheader = list(for_header0,for_header1,for_headerall)
 for (i in 1:length(listdosage)) {
   dat_dosage =  listdosage[[i]]
   for_header = listheader[[i]]
-  dat_dosage$RSID = for_header %>% arrange(CHROM,GENPOS) %>% pull(ID)
+  dat_dosage$RSID = for_header %>% arrange(CHROM,GENPOS) %>% pull(nearestGene)
   colnam = dat_dosage$RSID
   dat_dosage = dat_dosage %>% select(-c("#CHROM","POS","REF","ALT","RSID"))
   dat_dosage = t(dat_dosage)
@@ -187,7 +187,8 @@ for (i in 1:(ncol(dat_dosage)-1)){
   fit = lm(formula, data = covar.i)
   variablesofinterest = c(paste(rsid), "gd1")
   coefficients = summary(fit)$coefficients
-  tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+  tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+  colnames(tosave) = c("Estimate","clmin","clmax")
   tosave$rsid = rsid
   tosave$n = length(fit$residuals)
   tosave$model = "With previous gd"
@@ -205,7 +206,8 @@ for (i in 1:(ncol(dat_dosage)-1)){
   
   variablesofinterest = c(paste(rsid), "sex2")
   coefficients = summary(fit)$coefficients
-  tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+  tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+  colnames(tosave) = c("Estimate","clmin","clmax")
   tosave$rsid = rsid
   tosave$n = length(fit$residuals)
   tosave$model = "No previous gd"
@@ -223,11 +225,6 @@ y= toplot[toplot$model == "No previous gd",]
 names(y) = paste0(names(y), "2")
 
 df =cbind(x,y)
-
-df$clmin1 = as.numeric(df$Estimate1-(df$`Std. Error1`*1.96))
-df$clmax1 = as.numeric(df$Estimate1+(df$`Std. Error1`*1.96))
-df$clmin2 = as.numeric(df$Estimate2-(df$`Std. Error2`*1.96))
-df$clmax2 = as.numeric(df$Estimate2+(df$`Std. Error2`*1.96))
 
 
 #### Save data #### 
@@ -258,7 +255,8 @@ if (motherorchild == "mother") {
     
     variablesofinterest = c(paste(rsid), "sex1")
     coefficients = summary(fit)$coefficients
-    tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+    tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+    colnames(tosave) = c("Estimate","clmin","clmax")
     tosave$rsid = rsid
     tosave$n = length(fit$residuals)
     tosave$model = "Parity = zero"
@@ -277,7 +275,8 @@ if (motherorchild == "mother") {
     
     variablesofinterest = c(paste(rsid), "sex2")
     coefficients = summary(fit)$coefficients
-    tosave = as.data.frame(coefficients[variablesofinterest, c("Estimate", "Std. Error", "Pr(>|t|)")])
+    tosave = as.data.frame(cbind(coefficients[variablesofinterest, c("Estimate")],confint(fit)[variablesofinterest,]))
+    colnames(tosave) = c("Estimate","clmin","clmax")
     tosave$rsid = rsid
     tosave$n = length(fit$residuals)
     tosave$model = "Parity = one"
@@ -296,10 +295,6 @@ if (motherorchild == "mother") {
   
   df.2 =cbind(x,y)
   
-  df.2$clmin1 = as.numeric(df.2$Estimate1-(df.2$`Std. Error1`*1.96))
-  df.2$clmax1 = as.numeric(df.2$Estimate1+(df.2$`Std. Error1`*1.96))
-  df.2$clmin2 = as.numeric(df.2$Estimate2-(df.2$`Std. Error2`*1.96))
-  df.2$clmax2 = as.numeric(df.2$Estimate2+(df.2$`Std. Error2`*1.96))
   fwrite(df.2, snakemake@output[[2]], sep = "\t")
   cat("An additional file was saved for plotting first vs second pregnancy SNP effects in mothers with two pregnancies in MoBa")
 }
