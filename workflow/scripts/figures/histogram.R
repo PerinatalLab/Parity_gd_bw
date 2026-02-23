@@ -7,10 +7,10 @@ dat1 = fread(snakemake@input[[2]])
 datall = fread(snakemake@input[[3]])
 
 
-if (grepl("mother", snakemake@input[[1]])) {
+if (grepl("clean_phenotypes/gd", snakemake@input[[1]])) {
   xname = "Gestational duration, days" 
 } else {
-  xname = "Gestational duration, days"
+  xname = "Birth weight, z-score"
 }
 
 
@@ -23,8 +23,8 @@ p = ggplot(datall, aes(x = gd)) +
     alpha = 0.5,
     position = "identity"
   ) +
-  scale_fill_manual(values=c("#008837","#7b3294")) +
-  geom_histogram(
+    scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("Multiparous","Nulliparous"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
+    geom_histogram(
     bins = 150,
     fill = "black",
     alpha = 0.2
