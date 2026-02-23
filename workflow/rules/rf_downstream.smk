@@ -18,40 +18,22 @@ rule plot_r2:
 
 
 
-rule optimal_rf:
-    'Extracting predicted outcome (for 10 000 iterations, oob predictions) with the tuned hyperparameters'
-    input:
-        "results/work/rf/input_{feature}/{phenotype}/{motherorchild}/parityall_input_rf.csv",
-        "results/work/rf/tuning_hyperparameters/{feature}/grid_mbo_{phenotype}_{motherorchild}_parityall.csv",
-	"results/work/clean_phenotypes/{phenotype}/{motherorchild}/parityall_covar.txt"
-
-    output:
-        "results/work/rf/resources/{phenotype}/{motherorchild}/input_{feature}/mean_predicted_{phenotype}_parityall.csv",
-        "results/work/rf/resources/{phenotype}/{motherorchild}/input_{feature}/PGSxparity_coeff_parityall.csv"
-
-    conda:
-        "../envs/basicR.yml"
-
-    script:
-        "../scripts/figures/rf/loop_optimal_rf.R"
-
-
-
-
 rule plot_pgsxparity:
     'Plotting the potential PGSxparity interactions for each phenotype and genome'
     input:
-        expand("results/work/rf/resources/{phenotype}/{motherorchild}/input_{{feature}}/PGSxparity_coeff_parityall.csv", phenotype = pheno_main, motherorchild = motherorchild)
+	"results/work/rf/input_{feature}/{pheno}/{motherorchild}/parityall_input_rf.csv",
+        "results/work/rf/tuning_hyperparameters/{feature}/grid_mbo_{pheno}_{motherorchild}_parityall.csv",
+        "results/work/clean_phenotypes/{pheno}/{motherorchild}/parityall_covar.txt"
 
     output:
-        "results/figures/rf/GxE_input{feature}.png",
-	"results/figures/rf/GxE_input{feature}_only_gd.png"
+        "results/work/rf/lm/GxE-input_{feature}-{pheno}-{motherorchild}.rsd",
+        "results/figures/rf/GxE-input_{feature}-{pheno}-{motherorchild}.png"
 
     conda:
         "../envs/basicR.yml"
 
     script:
-        "../scripts/figures/rf/GxE_rf_plot.R"
+        "../scripts/figures/rf/GxE.R"
 
 
 
