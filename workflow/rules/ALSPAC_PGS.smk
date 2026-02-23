@@ -17,8 +17,7 @@ rule run_PGS:
 	input:
 		expand('results/PGS/gd_Mother_{parity}/PGS.txt',parity=PARITY),
 		'results/PGS/gd_Mother_parity0/PGS_parityall.txt',
-		'results/PGS/gd_Mother_parity1/PGS_parityall.txt',
-		expand('results/PGS/gd_Mother_{parity}/quantile_plot.png',parity=PARITY)
+		'results/PGS/gd_Mother_parity1/PGS_parityall.txt'
 	   
 rule run_PRScs:
   input:
