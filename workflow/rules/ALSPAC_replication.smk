@@ -47,6 +47,8 @@ rule run_phen:
     expand("results/replication/{traits}_{genome}_{cohorts}/ID_unrelated.eigenvec",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
     expand("results/replication/{traits}_{genome}_{cohorts}/phe.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
     expand("results/replication/{traits}_{genome}_{cohorts}/cov.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS)
+
+
 ##--------------------------- analysis rules -------------------------
 ## select ALSPAC ID for each
 rule ID:
@@ -65,7 +67,7 @@ rule ID:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/replication/ID.R  \
+    Rscript --vanilla workflow/scripts/ALSPAC_replication/ID.R  \
       --phen {input.phen} \
       --linkfile {input.linkfile} \
       --genoID {input.genoID} \
@@ -143,7 +145,7 @@ rule regenie_phen:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/replication/regenie_phen.R  \
+    Rscript --vanilla workflow/scripts/ALSPAC_replication/regenie_phen.R  \
       --phen {input.phen} \
       --pca {input.pca} \
       --ID {input.ID} \
@@ -350,7 +352,7 @@ rule merge:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/replication/merge.R  \
+    Rscript --vanilla workflow/scripts/ALSPAC_replication/merge.R  \
       --rdir {params.rdir} \
       --pdir {params.pdir} \
       >& {log}
