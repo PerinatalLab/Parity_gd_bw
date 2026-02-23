@@ -17,3 +17,15 @@ GE = [i.strip() for i in open(config["features"], 'r')]
 pheno_all = [i.strip() for i in open(config["phenotypes"], 'r')]
 pheno_main = [i for i in pheno_all if i != "fertility"]
 pheno_sup = [i for i in pheno_all if i != "gd" and  i != "bw_zscore"]
+
+def format_duos(d, x):
+        print(d.head(10))
+        print(d.shape)
+        d= d.loc[d["IID"].isin(x.IID.values), :]
+        print(d.shape)
+        d.drop_duplicates(subset= ["IID"], inplace= True, keep= 'first')
+        print(d.shape)
+        d= d[["IID"]]
+        print(d.shape)
+        return d
+
