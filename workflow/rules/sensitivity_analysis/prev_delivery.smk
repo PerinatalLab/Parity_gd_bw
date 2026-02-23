@@ -152,10 +152,10 @@ rule plot_previous_delivery:
 rule plot_firstvssecond:
     'Plot betas for first and second preg (same mothers in both pregnancies). On gd.'
     input:
-        "resources/forfigs/gd/mother_firstvssecond.csv"
+        "resources/forfigs/{phenotype}/mother_firstvssecond.csv"
 
     output:
-        "results/figures/firstvssecond.png"
+        "results/figures/{phenotype}_firstvssecond.png"
 
     conda:
         "../envs/basicR.yml"
