@@ -12,7 +12,24 @@ rule all:
 #        "results/checks/rf_format_performed.txt",
 #        "results/checks/rf_allpgs_performed.txt",
         "results/checks/rf_downstream_performed.txt",
-	"results/work/GWAS/ldsc_all_to_all_correlation.txt"
+	"results/work/GWAS/ldsc_all_to_all_correlation.txt",
+"results/replication/gd_Mother_parity0/gwas_replication.tsv",
+    "results/replication/gd_Mother_parity1/gwas_replication.tsv",
+    "results/replication/gd_Mother_parityall/gwas_replication.tsv",
+    "results/replication/gd_Child_parity0/gwas_replication.tsv",
+    "results/replication/gd_Child_parityall/gwas_replication.tsv",
+    "results/replication/bw_zscore_Mother_parity0/gwas_replication.tsv",
+    "results/replication/bw_zscore_Mother_parity1/gwas_replication.tsv",
+    "results/replication/bw_zscore_Mother_parityall/gwas_replication.tsv",
+    "results/replication/bw_zscore_Child_parity0/gwas_replication.tsv",
+    "results/replication/bw_zscore_Child_parity1/gwas_replication.tsv",
+    "results/replication/bw_zscore_Child_parityall/gwas_replication.tsv",
+	"results/PGS/gd_Mother_parity0/PGS.txt",
+	"results/PGS/gd_Mother_parity1/PGS.txt",
+	"results/PGS/gd_Mother_effectSNPnoInteraction_parityall/PGS.txt",
+	"results/PGS/gd_Mother_parity1/PGS_parityall.txt",
+	"results/PGS/gd_Mother_parity0/PGS_parityall.txt"
+
 
 
 include: "rules/common.smk"
@@ -25,3 +42,5 @@ include: "rules/h2_corr.smk"
 include: "rules/rf_prep.smk"
 include: "rules/rf.smk"
 include: "rules/rf_downstream.smk"
+include: "rules/ALSPAC_replication.smk"
+include: "rules/ALSPAC_PGS.smk""
