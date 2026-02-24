@@ -79,11 +79,22 @@ p = aa %>%
         panel.background = element_rect(fill = "transparent", colour = NA),
         plot.background = element_rect(fill = "transparent", colour = NA),
         legend.key = element_rect(colour = "transparent", fill = "transparent"),
-        legend.background = element_rect(colour = "transparent", fill = "transparent")
+        legend.background = element_rect(colour = "transparent", fill = "transparent"),
+	plot.margin = margin(20, 50, 5.5, 5.5)
         ) +
   scale_shape_manual(labels=c("Multiparous","Nulliparous"),values=c(22, 21), guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5)) +
   scale_fill_manual(values=c("#7b3294", "#008837"),labels=c("Multiparous","Nulliparous"),guide = guide_legend(reverse=T,title.position="top",title.hjust =0.5))+
-  geom_text(aes(x=Inf,label=gc),size=2.5, hjust = 1, color="black")
+  geom_text(aes(x=Inf,label=gc),size=2.5, hjust = -0.2, color="black") +
+  coord_cartesian(clip = "off") +
+  geom_text(
+    x = Inf,
+    y = Inf,
+    label = "Genetic\ncorrelation",
+    hjust = -0.1,
+    vjust = 0,
+    size = 2.5,
+    fontface = "bold"
+  )
 
 
 
