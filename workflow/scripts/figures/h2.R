@@ -94,6 +94,14 @@ p = aa %>%
     vjust = 0,
     size = 2.5,
     fontface = "bold"
+  ) + geom_text(
+    x = -Inf,
+    y = Inf,
+    label = expression(h^2),
+    hjust = -1, 
+    vjust = -0.5,  
+    size = 3,
+    fontface = "bold"
   )
 
 
