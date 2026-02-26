@@ -31,7 +31,7 @@ rule run_PRScs:
 rule format_sumstats:
 	'Format summary statistics according to the PRS-CS.'
 	input:
-		'/mnt/scratch/karin/Parity_gd_bw_pw/results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
+		'results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
 	output:
 		'results/PGS/gd_Mother_{parity}/formated_sumstats.txt'
 	log:
@@ -55,7 +55,7 @@ rule PRScs:
     ls_ref=expand('/mnt/scratch/xiaoping/resource/ldblk_1kg_eur/ldblk_1kg_chr{ichr}.hdf5',ichr=CHR),
     bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/rsid.bim',
     code='workflow/envs/PRScs/PRScs.py',
-    gwas='/mnt/scratch/karin/Parity_gd_bw_pw/results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
+    gwas='results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
   output:
     'results/PGS/gd_Mother_{parity}/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt'
   params:
