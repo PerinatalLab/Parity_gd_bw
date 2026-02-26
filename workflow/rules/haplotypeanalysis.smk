@@ -204,7 +204,10 @@ rule linear_hypotheses:
         "results/effect_origin/haplotypes/{pheno}/{motherorchild}-{parity}-h2-MnT", #the maternal nontransmitted alleles
         "results/effect_origin/haplotypes/{pheno}/{motherorchild}-{parity}-h3-PT", #the paternal transmitted alleles 	
         "results/work/clean_phenotypes/{pheno}/{motherorchild}/parityall_phenofile.txt",
-        "results/work/clean_phenotypes/{pheno}/{motherorchild}/parityall_covar.txt"
+        "results/work/clean_phenotypes/{pheno}/mother/parityall_covar.txt",
+        "results/work/clean_phenotypes/{pheno}/child/parityall_covar.txt",
+        "results/effect_origin/aux/ids/{pheno}/duos.txt"
+
 
     output:
         "results/effect_origin/{pheno}/lh/{motherorchild}-{parity}-results.txt",

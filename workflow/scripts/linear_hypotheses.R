@@ -36,10 +36,6 @@ h1= fread(snakemake@input[[1]])
 h2= fread(snakemake@input[[2]])
 h3= fread(snakemake@input[[3]])
 
-#h1 = fread("/mnt/scratch/karin/for_review/results/effect_origin/haplotypes/bw_zscore/mother-parity0-h1-MT")
-#h2 = fread("/mnt/scratch/karin/for_review/results/effect_origin/haplotypes/bw_zscore/mother-parity0-h2-MnT")
-#h3 = fread("/mnt/scratch/karin/for_review/results/effect_origin/haplotypes/bw_zscore/mother-parity0-h3-PT")
-
 h1= format_haps(h1)
 h2= format_haps(h2)
 h3= format_haps(h3)
@@ -49,9 +45,29 @@ if (grepl("bw_zscore", snakemake@input[[1]])) {
 } else if (grepl("haplotypes/gd", snakemake@input[[1]])) {
   pheno= fread(snakemake@input[[4]], select = c("IID","gd"))
 }
-covar= fread(snakemake@input[[5]])
-#pheno = fread("/mnt/scratch/karin/for_review/results/work/clean_phenotypes/bw_zscore/mother/parityall_phenofile.txt", select = c("IID","bw_zscore"))
-#covar = fread("/mnt/scratch/karin/for_review/results/work/clean_phenotypes/bw_zscore/mother/parityall_covar.txt")
+
+
+covar_m= fread(snakemake@input[[5]])
+covar_c= fread(snakemake@input[[6]])
+
+if (grepl("mother",snakemake@input[[1]])) {
+  covar_m= fread(snakemake@input[[5]], drop = c("FID"))
+  covar_c= fread(snakemake@input[[6]], select = c("IID","parity"))
+  colnames(covar_c) = c("IID","parity_c")
+  duos = fread(snakemake@input[[7]])
+
+  dat = inner_join(duos,covar_m, by = c("Mother"="IID"))
+  dat = inner_join(dat,covar_c, by = c("Child"="IID"))
+  dat = dat[dat$parity == dat$parity_c,]
+  covar = dat %>% select(-c("parity_c","Child"))
+  colnames(covar)[colnames(covar) == "Mother"] = "IID"
+
+} else if (grepl("child",snakemake@input[[1]])) {
+  covar = fread(snakemake@input[[6]])
+
+}
+
+
 pheno = inner_join(pheno, covar, by = c("IID"))
 
 if (grepl("parity0",snakemake@input[[1]])) {
