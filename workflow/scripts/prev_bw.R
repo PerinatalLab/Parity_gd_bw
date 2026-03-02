@@ -183,7 +183,7 @@ for (i in 1:(ncol(dat_dosage)-1)){
   
   formula = as.formula(
     paste(
-      "bw2 ~ sex2 + genotyping_chip + ma2 +",
+      "bw2 ~ sex2 + genotyping_chip + ma2 + SVLEN_DG",
       "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
       "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG + bw1 +",
       rsid
@@ -203,7 +203,7 @@ for (i in 1:(ncol(dat_dosage)-1)){
   
   formula = as.formula(
     paste(
-      "bw2 ~ sex2 + genotyping_chip + ma2 +",
+      "bw2 ~ sex2 + genotyping_chip + ma2 + SVLEN_DG",
       "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
       "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG +",
       rsid
@@ -247,7 +247,7 @@ if (motherorchild == "mother") {
 
     formula = as.formula(
       paste(
-        "bw1 ~ sex1 + genotyping_chip + ma1 +",
+        "bw1 ~ sex1 + genotyping_chip + ma1 + SVLEN_DG",
         "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
         "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG  +",
         rsid
@@ -267,7 +267,7 @@ if (motherorchild == "mother") {
 
     formula = as.formula(
       paste(
-        "bw2 ~ sex2 + genotyping_chip + ma2 +",
+        "bw2 ~ sex2 + genotyping_chip + ma2 + SVLEN_DG",
         "PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG +",
         "PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG +",
         rsid
