@@ -47,11 +47,11 @@ dat$genotyping_chip = as.factor(dat$genotyping_chip)
 
 if (grepl("dosage/bw",filename)) {
 	### Residualized birth weight zscores ###
-        lmm = lm(bw_zscore ~ pregnancy_duration + sex  + genotyping_chip + PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG + PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG, dat = dat)
+        lmm = lm(bw_zscore ~ SVLEN_DG + KJONN + poly(maternalage,2)  + genotyping_chip + PC1_AVG + PC2_AVG + PC3_AVG + PC4_AVG + PC5_AVG + PC6_AVG + PC7_AVG + PC8_AVG + PC9_AVG + PC10_AVG, dat = dat)
         dat$bw_res = mean(dat$bw_zscore)+lmm$residuals
 
         dat2 = dat %>%
-                select(-bw_zscore, -genotyping_chip, -sex, -pregnancy_duration,-PC1_AVG,-PC2_AVG,-PC3_AVG,-PC4_AVG,-PC5_AVG,-PC6_AVG,-PC7_AVG,-PC8_AVG,-PC9_AVG,-PC10_AVG) %>%
+                select(-bw_zscore, -genotyping_chip, -KJONN, -SVLEN_DG,-maternalage ,-PC1_AVG,-PC2_AVG,-PC3_AVG,-PC4_AVG,-PC5_AVG,-PC6_AVG,-PC7_AVG,-PC8_AVG,-PC9_AVG,-PC10_AVG) %>%
                 rename("bw_zscore"="bw_res") # genetic features only
         dat = dat %>% select(-bw_res) # genetic, gestational duration, sex, chip and the ten first genotype principal components
 
