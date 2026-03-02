@@ -15,7 +15,7 @@ Each respective folder contains scripts necessary to run the whole pipeline. REG
 * Karin Ytterberg (@ykarin97})
 * Hedvig Sundelin (@hedvigsun)
 * Pol Sole-Navais (@psnavais)
-
+* Xiaoping Wu (@Xiaoping-Wu)
 
 ## Usage
 
