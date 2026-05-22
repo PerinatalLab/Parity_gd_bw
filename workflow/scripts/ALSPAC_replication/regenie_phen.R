@@ -94,6 +94,7 @@ if (traits=="gd" & cohorts=="parity0"){
   df <- pca %>%
     inner_join(ID,by=c("FID"="chipID")) %>%
     inner_join(phen,by="cidB4346") %>%
+    filter(!is.na(PARITET)) %>%
     mutate(FID=imputedID,IID=imputedID,phe=GA) %>%
     select(FID,IID,phe,PARITET,maternal_age_at_delivery,sex_assigned_at_birth,paste0("PC",1:10,sep="")) %>%
     filter(if_all(everything(), ~ !is.na(.))) %>%
@@ -127,6 +128,7 @@ if (traits=="gd" & cohorts=="parity0"){
   df <- pca %>%
     inner_join(ID,by=c("FID"="chipID")) %>%
     inner_join(phen,by="cidB4346") %>%
+    filter(!is.na(PARITET)) %>%
     mutate(bw_zscore=(birth_weight - mean(birth_weight, na.rm = TRUE)) / sd(birth_weight, na.rm = TRUE)) %>%
     mutate(FID=imputedID,IID=imputedID,phe=bw_zscore) %>%
     select(FID,IID,phe,PARITET,maternal_age_at_delivery,sex_assigned_at_birth,GA,paste0("PC",1:10,sep="")) %>%
@@ -142,9 +144,17 @@ if (traits=="gd" & cohorts=="parity0"){
 
 phe <- df %>%
   select(FID,IID,phe)
-cov <- df %>%
-  select(-phe) %>%
-  arrange(PARITET) #make sure 0 start first
+
+
+if(cohorts=="parityall"){
+  cov <- df %>%
+    select(-phe) %>%
+    arrange(PARITET) #make sure 0 start first
+}else{
+  cov <- df %>%
+    select(-phe) 
+}
+
 
 write.table(phe,opt$phe,col.names = T,row.names=F,quote=F,sep="\t")
 write.table(cov,opt$cov,col.names = T,row.names=F,quote=F,sep="\t")
