@@ -1,6 +1,6 @@
 ## Estimate polygenic score for gestational duration---------------------------
 ## @Xiaoping Wu
-## 2026-01-15
+## 2025-11-24
 
 
 # --------------------------- Dictionaries ---------------------------
@@ -17,7 +17,11 @@ rule run_PGS:
 	input:
 		expand('results/PGS/gd_Mother_{parity}/PGS.txt',parity=PARITY),
 		'results/PGS/gd_Mother_parity0/PGS_parityall.txt',
-		'results/PGS/gd_Mother_parity1/PGS_parityall.txt'
+		'results/PGS/gd_Mother_parity1/PGS_parityall.txt',
+		'results/PGS/gd_Child_parityall/PGS_by_Mother.txt',
+		expand('results/PGS/gd_Mother_{parity}/quantile_plot.png',parity=PARITY),
+		"results/PGS/gd_Mother_effectSNPnoInteraction_parityall/interaction_plot_include_Fetal_20250515.png",
+		"results/PGS/gd_Mother_effectSNPnoInteraction_parityall/interaction_plot2_include_Fetal_20250515.png"
 	   
 rule run_PRScs:
   input:
@@ -31,7 +35,7 @@ rule run_PRScs:
 rule format_sumstats:
 	'Format summary statistics according to the PRS-CS.'
 	input:
-		'results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
+		'/mnt/scratch/karin/Parity_gd_bw_pw/results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
 	output:
 		'results/PGS/gd_Mother_{parity}/formated_sumstats.txt'
 	log:
@@ -40,8 +44,8 @@ rule format_sumstats:
 		'../envs/Rbase.yml'
 	shell:
 		'''
-		chmod +x ./workflow/scripts/ALSPAC_PGS/format_sumstats.R
-		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/format_sumstats.R \
+		chmod +x ./workflow/scripts/PRScs/format_sumstats.R
+		Rscript --vanilla ./workflow/scripts/PRScs/format_sumstats.R \
       --gwas {input[0]}  \
       --gwas_format {output[0]} \
       >& {log[0]}
@@ -53,40 +57,40 @@ rule PRScs:
   input:
     sumstats='results/PGS/gd_Mother_{parity}/formated_sumstats.txt',
     ls_ref=expand('/mnt/scratch/xiaoping/resource/ldblk_1kg_eur/ldblk_1kg_chr{ichr}.hdf5',ichr=CHR),
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/rsid.bim',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/rsid.bim',
     code='workflow/envs/PRScs/PRScs.py',
-    gwas='results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
+    gwas='/mnt/scratch/karin/Parity_gd_bw_pw/results/work/GWAS/gd/regenie/step2/QC/mother/{parity}.txt'
   output:
     'results/PGS/gd_Mother_{parity}/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt'
   params:
     ld_ref='/mnt/scratch/xiaoping/resource/ldblk_1kg_eur',
     out_prefix='results/PGS/gd_Mother_{parity}/beta/beta',
     ichr='{ichr}',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/rsid'
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/rsid'
   log:
     'log/PRScs_chr{ichr}_mother_GD_{parity}.log'
   conda:
     '../envs/PRS-CS.yml'
   shell:
     """
-    chmod +x ./workflow/scripts/ALSPAC_PGS/PRS-CS.sh
-    ./workflow/scripts/ALSPAC_PGS/PRS-CS.sh {params.ld_ref}  {input.sumstats}  {input.gwas}  {params.out_prefix} {params.bim} {params.ichr} {input.code} &> {log} 
+    chmod +x ./workflow/scripts/PRScs/PRS-CS.sh
+    ./workflow/scripts/PRScs/PRS-CS.sh {params.ld_ref}  {input.sumstats}  {input.gwas}  {params.out_prefix} {params.bim} {params.ichr} {input.code} &> {log} 
     """		
 
 rule PGS_parity0:
   'Create PGS for all individuals'
   input:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bed',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bim',
-    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.fam',
-    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/update_id_chr{ichr}.tsv",
-    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/duplicated_id_chr{ichr}",
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
     beta='results/PGS/gd_Mother_parity0/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
     phe='results/replication/gd_Mother_parity0/phe.tsv'
   output:
     'results/PGS/gd_Mother_parity0/score/chr{ichr}.sscore'
   params:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}',
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
     score='results/PGS/gd_Mother_parity0/score/chr{ichr}'
   log:
     'log/score_chr{ichr}_gd_Mother_parity0.log'
@@ -114,17 +118,17 @@ rule PGS_parity0:
 rule PGS_parity1:
   'Create PGS for all individuals'
   input:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bed',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bim',
-    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.fam',
-    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/update_id_chr{ichr}.tsv",
-    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/duplicated_id_chr{ichr}",
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
     beta='results/PGS/gd_Mother_parity1/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
     phe='results/replication/gd_Mother_parity1/phe.tsv'
   output:
     'results/PGS/gd_Mother_parity1/score/chr{ichr}.sscore'
   params:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}',
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
     score='results/PGS/gd_Mother_parity1/score/chr{ichr}'
   log:
     'log/score_chr{ichr}_gd_Mother_parity1.log'
@@ -151,17 +155,17 @@ rule PGS_parity1:
 rule PGS_parityall:
   'Create PGS for all individuals'
   input:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bed',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bim',
-    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.fam',
-    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/update_id_chr{ichr}.tsv",
-    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/duplicated_id_chr{ichr}",
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
     beta='results/PGS/gd_Mother_effectSNPnoInteraction_parityall/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
     phe='results/replication/gd_Mother_parityall/phe.tsv'
   output:
     'results/PGS/gd_Mother_effectSNPnoInteraction_parityall/score/chr{ichr}.sscore'
   params:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}',
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
     score='results/PGS/gd_Mother_effectSNPnoInteraction_parityall/score/chr{ichr}'
   log:
     'log/score_chr{ichr}_gd_Mother_effectSNPnoInteraction_parityall.log'
@@ -201,27 +205,97 @@ rule concat_PGS:
 		'../envs/Rbase.yml'
 	shell:
 	  '''
-	  chmod +x ./workflow/scripts/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
+	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
       > {log} 2>&1
 	  '''
 
+rule PGS_check_parity0:
+	'PGS quantile plot'
+	input:
+		PGS='results/PGS/gd_Mother_parity0/PGS.txt',
+		phe='results/replication/gd_Mother_parity0/phe.tsv',
+		cov='results/replication/gd_Mother_parity0/cov.tsv'
+	output:
+		'results/PGS/gd_Mother_parity0/quantile_plot.png'
+	log:
+	  'log/PGS_check_gd_Mother_parity0.log'
+	conda:
+		'../envs/Rbase.yml'
+	shell:
+	  '''
+	  chmod +x ./workflow/scripts/PRScs/PRS_accuracy.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_accuracy.R \
+      --PRS {input[0]}  \
+      --phe {input[1]}  \
+      --cov {input[2]}  \
+      --quantile_plot {output[0]} \
+      > {log} 2>&1
+	  '''
+	  
+rule PGS_check_parity1:
+	'PGS quantile plot'
+	input:
+		PGS='results/PGS/gd_Mother_parity1/PGS.txt',
+		phe='results/replication/gd_Mother_parity1/phe.tsv',
+		cov='results/replication/gd_Mother_parity1/cov.tsv'
+	output:
+		'results/PGS/gd_Mother_parity1/quantile_plot.png'
+	log:
+	  'log/PGS_check_gd_Mother_parity1.log'
+	conda:
+		'../envs/Rbase.yml'
+	shell:
+	  '''
+	  chmod +x ./workflow/scripts/PRScs/PRS_accuracy.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_accuracy.R \
+      --PRS {input[0]}  \
+      --phe {input[1]}  \
+      --cov {input[2]}  \
+      --quantile_plot {output[0]} \
+      > {log} 2>&1
+	  '''
+	  
+rule PGS_check_parityall:
+	'PGS quantile plot'
+	input:
+		PGS='results/PGS/gd_Mother_effectSNPnoInteraction_parityall/PGS.txt',
+		phe='results/replication/gd_Mother_parityall/phe.tsv',
+		cov='results/replication/gd_Mother_parityall/cov.tsv'
+	output:
+		'results/PGS/gd_Mother_effectSNPnoInteraction_parityall/quantile_plot.png'
+	log:
+	  'log/PGS_check_gd_Mother_effectSNPnoInteraction_parityall.log'
+	conda:
+		'../envs/Rbase.yml'
+	shell:
+	  '''
+	  chmod +x ./workflow/scripts/PRScs/PRS_accuracy_parityall.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_accuracy_parityall.R \
+      --PRS {input[0]}  \
+      --phe {input[1]}  \
+      --cov {input[2]}  \
+      --quantile_plot {output[0]} \
+      > {log} 2>&1
+	  '''
+
+
 rule PGS_parity0toall:
   'beta from parity0, Create PGS for all individuals'
   input:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bed',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bim',
-    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.fam',
-    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/update_id_chr{ichr}.tsv",
-    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/duplicated_id_chr{ichr}",
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
     beta='results/PGS/gd_Mother_parity0/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
     phe='results/replication/gd_Mother_parityall/phe.tsv'
   output:
     'results/PGS/gd_Mother_parity0/score_parityall/chr{ichr}.sscore'
   params:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}',
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
     score='results/PGS/gd_Mother_parity0/score_parityall/chr{ichr}'
   log:
     'log/score_chr{ichr}_gd_Mother_parity0toparityall.log'
@@ -249,17 +323,17 @@ rule PGS_parity0toall:
 rule PGS_parity1toall:
   'beta from parity1, Create PGS for all individuals'
   input:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bed',
-    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.bim',
-    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}.fam',
-    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/update_id_chr{ichr}.tsv",
-    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/duplicated_id_chr{ichr}",
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
     beta='results/PGS/gd_Mother_parity1/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
     phe='results/replication/gd_Mother_parityall/phe.tsv'
   output:
     'results/PGS/gd_Mother_parity1/score_parityall/chr{ichr}.sscore'
   params:
-    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_PGS/geno/chr{ichr}',
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
     score='results/PGS/gd_Mother_parity1/score_parityall/chr{ichr}'
   log:
     'log/score_chr{ichr}_gd_Mother_parity1toparityall.log'
@@ -297,8 +371,8 @@ rule concat_PGS_parity0toall:
 		'../envs/Rbase.yml'
 	shell:
 	  '''
-	  chmod +x ./workflow/scripts/ALSPAC_PGS/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
+	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
       > {log} 2>&1
@@ -318,9 +392,103 @@ rule concat_PGS_parity1toall:
 		'../envs/Rbase.yml'
 	shell:
 	  '''
-	  chmod +x ./workflow/scripts/ALSPAC_PGS/PRS_sum.R
-		Rscript --vanilla ./workflow/scripts/ALSPAC_PGS/PRS_sum.R \
+	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
       --PRS_chr {params[0]}  \
       --PRS {output[0]} \
+      > {log} 2>&1
+	  '''
+
+rule PGS_parityall_fetal:
+  input:
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bed',
+    bim='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.bim',
+    fam='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}.fam',
+    update_id="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/update_id_chr{ichr}.tsv",
+    dupid="/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/duplicated_id_chr{ichr}",
+    beta='results/PGS/gd_Mother_effectSNPnoInteraction_parityall/beta/beta_pst_eff_a1_b0.5_phiauto_chr{ichr}.txt',
+    phe='results/replication/gd_Child_parityall/phe.tsv'
+  output:
+    'results/PGS/gd_Child_parityall/score_by_Mother/chr{ichr}.sscore'
+  params:
+    bed='/mnt/scratch/xiaoping/gestational_duration/results/ALSPAC_B5316/geno/chr{ichr}',
+    score='results/PGS/gd_Child_parityall/score_by_Mother/chr{ichr}'
+  log:
+    'log/score_chr{ichr}_gd_Child_parityall_by_Mother.log'
+  threads:1
+  resources: mem_mb=4000
+  conda:
+    '../envs/plink2.yml'
+  shell:
+    '''
+    jobid=$$
+    mkdir -p "tmp/job{jobid}_PGS"
+    awk 'NR>1 {{print $1,$2}}' {input.phe} >tmp/job{jobid}_PGS/id.txt
+    plink2 --bfile {params.bed}           \
+          --keep tmp/job{jobid}_PGS/id.txt    \
+          --exclude {input.dupid}         \
+          --update-name {input.update_id} \
+          --score {input.beta} 2 4 6      \
+          --threads {threads}             \
+          --memory {resources.mem_mb}     \
+          --out {params.score}            \
+          &> {log}
+    '''
+
+
+
+rule concat_PGS_parityall_fetal:
+	'Concat per-CHR PGS into a single PGS.'
+	input:
+		expand('results/PGS/gd_Child_parityall/score_by_Mother/chr{ichr}.sscore', ichr=CHR)
+	output:
+		'results/PGS/gd_Child_parityall/PGS_by_Mother.txt'
+	params:
+	  'results/PGS/gd_Child_parityall/score_by_Mother'
+	log:
+	  'log/concat_PGS_gd_Child_parityall_by_Mother.log'
+	conda:
+		'../envs/Rbase.yml'
+	shell:
+	  '''
+	  chmod +x ./workflow/scripts/PRScs/PRS_sum.R
+		Rscript --vanilla ./workflow/scripts/PRScs/PRS_sum.R \
+      --PRS_chr {params[0]}  \
+      --PRS {output[0]} \
+      > {log} 2>&1
+	  '''
+
+rule interaction_plot:
+  input:
+    ID='results/replication/gd_Mother_parityall/ID.tsv',
+    phe='results/replication/gd_Mother_parityall/phe.tsv',
+    cov='results/replication/gd_Mother_parityall/cov.tsv',
+    prs='results/PGS/gd_Mother_effectSNPnoInteraction_parityall/PGS.txt',
+    fetal_ID='results/replication/gd_Child_parityall/ID.tsv',
+    fetal_prs="results/PGS/gd_Child_parityall/PGS_by_Mother.txt"
+  output:
+    outfile="results/PGS/gd_Mother_effectSNPnoInteraction_parityall/interaction_plot_include_Fetal_20250515.png",
+    outfile2="results/PGS/gd_Mother_effectSNPnoInteraction_parityall/interaction_plot2_include_Fetal_20250515.png"
+  params:
+    genome="Maternal",
+    traits="GD"
+  log:
+    "log/interaction_plot_GD.log"
+  conda:
+    '../envs/Rbase.yml'
+  shell:
+    '''
+	  chmod +x ./workflow/scripts/PRScs/interaction_plot_include_fetal.R
+		Rscript --vanilla ./workflow/scripts/PRScs/interaction_plot_include_fetal.R \
+      --ID {input.ID}  \
+      --phe {input.phe} \
+      --cov {input.cov} \
+      --prs {input.prs} \
+      --fetal_ID {input.fetal_ID} \
+      --fetal_prs {input.fetal_prs} \
+      --genome {params.genome} \
+      --traits {params.traits} \
+      --outfile {output.outfile} \
+      --outfile2 {output.outfile2} \
       > {log} 2>&1
 	  '''
