@@ -43,13 +43,12 @@ rule check_cross_results:
 
 
 rule tuning_mbo:
-    'Perform hyperparameter tuning using bayesian optimization and run the random forest model with the tuned hyperparameters (for 10 000 iterations) to evaluate the model performance by calculating the r2 on oob predictions'
+    'Perform hyperparameter tuning using bayesian optimization'
     input:
         "results/work/rf/input_{feature}/{phenotype}/{childormother}/{parity}_input_rf.csv"
 
     output:
-        "results/work/rf/tuning_hyperparameters/{feature}/grid_mbo_{phenotype}_{childormother}_{parity}.csv",
-        "results/work/rf/r2/{feature}/r2_mbo_{phenotype}_{childormother}_{parity}.csv"
+        "results/work/rf/tuning_hyperparameters/{feature}/grid_mbo_{phenotype}_{childormother}_{parity}.csv"
 
     conda:
         "../envs/rf.yml"
@@ -58,6 +57,20 @@ rule tuning_mbo:
         "../scripts/tune_mbo.R"
 
 
+rule tuning_mbo:
+    'Run the random forest model with the tuned hyperparameters (for 10 000 iterations) to evaluate the model performance by calculating the r2 on oob predictions'
+    input:
+        "results/work/rf/tuning_hyperparameters/{feature}/grid_mbo_{phenotype}_{childormother}_{parity}.csv",
+        "results/work/rf/input_{feature}/{phenotype}/{childormother}/{parity}_input_rf.csv"
+
+    output:
+        "results/work/rf/r2/{feature}/r2_mbo_{phenotype}_{childormother}_{parity}.csv"
+
+    conda:
+        "../envs/rf.yml"
+
+    script:
+        "../scripts/iter_mbo.R"
 
 rule tuning_cross:
     'Use nested cross-validation to tune hyperparameters (inner fold) and evaluate model performance (outer fold)'
