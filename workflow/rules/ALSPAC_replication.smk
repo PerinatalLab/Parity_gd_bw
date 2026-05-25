@@ -6,6 +6,7 @@
 # --------------------------- Dictionaries ---------------------------
 GENOME=["Mother","Child"] #maternal/fetal genome
 TRAITS=["gd","bw_zscore"] ## phenotype: gestational duration/birthweight
+#COHORTS=["parity0","parity1","parityall","parityallGE"]
 COHORTS=["parity0","parity1","parityall"]
 
 wildcard_constraints:
@@ -39,7 +40,9 @@ rule all:
 rule run_regenie:
   input:
     expand("results/replication/{traits}_{genome}_{cohorts}/gwas.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
-    expand("results/replication/{traits}_{genome}_parityallGE/gwas.tsv",traits=TRAITS,genome=GENOME)
+    expand("results/replication/{traits}_{genome}_parityallGE/gwas.tsv",traits=TRAITS,genome=GENOME),
+    expand("results/replication/{traits}_{genome}_{cohorts}/rs12087657_phe.regenie",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
+    expand("results/replication/{traits}_{genome}_parityallGE/rs12087657_phe.regenie",traits=TRAITS,genome=GENOME,cohorts=COHORTS)
     
 
 rule run_phen:
@@ -47,16 +50,14 @@ rule run_phen:
     expand("results/replication/{traits}_{genome}_{cohorts}/ID_unrelated.eigenvec",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
     expand("results/replication/{traits}_{genome}_{cohorts}/phe.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS),
     expand("results/replication/{traits}_{genome}_{cohorts}/cov.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS)
-
-
 ##--------------------------- analysis rules -------------------------
 ## select ALSPAC ID for each
 rule ID:
   'prepare ID with both pheno and geno'
   input:
-    phen="/mnt/archive/alspac/pheno/B4346/alspac-B4346-phenotype.tsv",
-    linkfile="/mnt/archive/alspac/pheno/B4346/alspac-B4346-linkage.tsv",
-    genoID="/mnt/archive/alspac/alspac/B4346/imputed/data/swapped.sample"
+    phen="/mnt/archive/alspac/pheno/B5316/alspac-B5316-phenotype.tsv",
+    linkfile="/mnt/archive/alspac/pheno/B5316/alspac-B5316-linkage.tsv",
+    genoID="/mnt/archive/alspac/alspac/B5316/imputed/swapped.sample"
   output:
     expand("results/replication/{traits}_{genome}_{cohorts}/ID.tsv",traits=TRAITS,genome=GENOME,cohorts=COHORTS)
   params:
@@ -67,7 +68,7 @@ rule ID:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/ALSPAC_replication/ID.R  \
+    Rscript --vanilla workflow/scripts/replication/ID.R  \
       --phen {input.phen} \
       --linkfile {input.linkfile} \
       --genoID {input.genoID} \
@@ -78,14 +79,14 @@ rule ID:
 
 rule IDunrelated_pca_mor:
   input:
-    bed="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/moms/legacy2/freeze_id.bed",
-    bim="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/moms/legacy2/freeze_id.bim",
-    fam="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/moms/legacy2/freeze_id.fam",
+    bed="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/moms/legacy2/freeze_id.bed",
+    bim="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/moms/legacy2/freeze_id.bim",
+    fam="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/moms/legacy2/freeze_id.fam",
     ID="results/replication/{traits}_Mother_{cohorts}/ID.tsv"
   output:
     "results/replication/{traits}_Mother_{cohorts}/ID_unrelated.eigenvec"
   params:
-    bed="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/moms/legacy2/freeze_id",
+    bed="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/moms/legacy2/freeze_id",
     outdir="results/replication/{traits}_Mother_{cohorts}"
   conda:
     "../envs/plink2.yml"
@@ -104,14 +105,14 @@ rule IDunrelated_pca_mor:
 
 rule IDunrelated_pca_child:
   input:
-    bed="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/fets/freeze_id.bed",
-    bim="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/fets/freeze_id.bim",
-    fam="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/fets/freeze_id.fam",
+    bed="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/fets/freeze_id.bed",
+    bim="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/fets/freeze_id.bim",
+    fam="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/fets/freeze_id.fam",
     ID="results/replication/{traits}_Child_{cohorts}/ID.tsv"
   output:
     "results/replication/{traits}_Child_{cohorts}/ID_unrelated.eigenvec"
   params:
-    bed="/mnt/archive/alspac/alspac/B4346/genotyping_arrays/fets/freeze_id",
+    bed="/mnt/archive/alspac/alspac/B5316/genotyping_arrays/fets/freeze_id",
     outdir="results/replication/{traits}_Child_{cohorts}"
   conda:
     "../envs/plink2.yml"
@@ -130,7 +131,7 @@ rule IDunrelated_pca_child:
 
 rule regenie_phen:
   input:
-    phen="/mnt/archive/alspac/pheno/B4346/alspac-B4346-phenotype.tsv",
+    phen="/mnt/archive/alspac/pheno/B5316/alspac-B5316-phenotype.tsv",
     ID="results/replication/{traits}_{genome}_{cohorts}/ID.tsv",
     pca="results/replication/{traits}_{genome}_{cohorts}/ID_unrelated.eigenvec"
   output:
@@ -145,7 +146,7 @@ rule regenie_phen:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/ALSPAC_replication/regenie_phen.R  \
+    Rscript --vanilla workflow/scripts/replication/regenie_phen.R  \
       --phen {input.phen} \
       --pca {input.pca} \
       --ID {input.ID} \
@@ -222,28 +223,7 @@ rule regenie_step2_add:
     """
 
 
-rule concat_gwas_add:
-  'Concatenate results from regenie'
-  input:
-    gwas=expand("results/replication/{{traits}}_{{genome}}_{{cohorts}}/chr{ichr}_phe.regenie",ichr=CHR),
-    replication_list="data/Moba/top_loci.txt"
-  output:
-    "results/replication/{traits}_{genome}_{cohorts}/gwas.tsv"
-  params:
-    "results/replication/{traits}_{genome}_{cohorts}"
-  log:
-    "log/replication_concat_{traits}_{genome}_{cohorts}.log"
-  shell:
-    """
-    head -1 {params[0]}/chr1_phe.regenie  > {output[0]}
-    
-    sigchr=$(awk '{{print $1}}' {input.replication_list}|sort|uniq)
-    for cc in ${{sigchr}}
-    do
-          awk 'NR>1' {params[0]}/chr${{cc}}_phe.regenie  >> {output[0]}
-    done
 
-    """
 
 rule regenie_step2_interactive:
   'GWAS using regenie for: whole sample, interaction(snp*parity), parity = 0 and parity > 0. Covariates are regressed out of the phenotypes and genetic markers. Linear regression is then used to test association of the residualized phenotype and the genetic marker.'
@@ -305,6 +285,31 @@ rule regenie_step2_interactive:
 
     """
 
+
+
+
+rule concat_gwas_add:
+  'Concatenate results from regenie'
+  input:
+    gwas=expand("results/replication/{{traits}}_{{genome}}_{{cohorts}}/chr{ichr}_phe.regenie",ichr=CHR),
+    replication_list="data/Moba/top_loci.txt"
+  output:
+    "results/replication/{traits}_{genome}_{cohorts}/gwas.tsv"
+  params:
+    "results/replication/{traits}_{genome}_{cohorts}"
+  log:
+    "log/replication_concat_{traits}_{genome}_{cohorts}.log"
+  shell:
+    """
+    head -1 {params[0]}/chr1_phe.regenie  > {output[0]}
+    
+    sigchr=$(awk '{{print $1}}' {input.replication_list}|sort|uniq)
+    for cc in ${{sigchr}}
+    do
+          awk 'NR>1' {params[0]}/chr${{cc}}_phe.regenie  >> {output[0]}
+    done
+
+    """
 rule concat_gwas_interactive:
   'Concatenate results from regenie'
   input:
@@ -352,9 +357,8 @@ rule merge:
     "../envs/Rbase.yml"
   shell:
     """
-    Rscript --vanilla workflow/scripts/ALSPAC_replication/merge.R  \
+    Rscript --vanilla workflow/scripts/replication/merge.R  \
       --rdir {params.rdir} \
       --pdir {params.pdir} \
       >& {log}
     """
-

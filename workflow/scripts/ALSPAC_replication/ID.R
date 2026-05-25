@@ -22,9 +22,9 @@ parsed_opts <- list(
   
 )
 if (interactive()) {
-  opt <- list(phen="/mnt/archive/alspac/pheno/B4346/alspac-B4346-phenotype.tsv",
-              linkfile="/mnt/archive/alspac/pheno/B4346/alspac-B4346-linkage.tsv",
-              genoID="/mnt/archive/alspac/alspac/B4346/imputed/data/swapped.sample",
+  opt <- list(phen="/mnt/archive/alspac/pheno/B5316/alspac-B5316-phenotype.tsv",
+              linkfile="/mnt/archive/alspac/pheno/B5316/alspac-B5316-linkage.tsv",
+              genoID="/mnt/archive/alspac/alspac/B5316/imputed/swapped.sample",
               outdir="results/replication/gd_mother_parity0/ID.txt"
   )
 } else {
@@ -34,12 +34,11 @@ if (interactive()) {
 
 phen <- fread(opt$phen) %>%
   mutate(iflivein1y=ifelse(stillbirths==2 & outcome_b_livebirth == 1 & live_births == 3,TRUE,FALSE)) %>%
-  mutate(ifhealth=ifelse(death_with_congenital_defect==-2 & termination_for_fetal_problem==7,TRUE,FALSE)) %>%
+  mutate(ifhealth=ifelse(is.na(death_with_congenital_defect) & termination_for_fetal_problem==7,TRUE,FALSE)) %>%
   mutate(ifnottwins=ifelse(pregnancy_size_summary == 1 & duplicate_pregnancy ==2,TRUE,FALSE)) %>%
-  mutate(ifnotART=ifelse(b6s_in_vitro_fertilisation_conception != 1,TRUE,FALSE)) %>%
-  mutate(ifspontaneous=ifelse(c4i_how_labour_started!=2 & c4i_how_labour_started!=3 & c4i_how_labour_started!=4 & c4i_how_labour_started!=-9999 ,TRUE,FALSE)) %>%
-  mutate(ifnotCS=ifelse(c6a_method_of_delivery != 3 & c6c_delivery_by_caesarean_section != 1 & c6c_delivery_by_caesarean_section !=2,TRUE,FALSE)) %>%
-  mutate(PARITET=case_when(
+  mutate(ifnotART=ifelse(b6s_in_vitro_fertilisation_conception == 2 | is.na(b6s_in_vitro_fertilisation_conception),TRUE,FALSE)) %>%
+  mutate(ifspontaneous=ifelse(c4i_how_labour_started==1 | (is.na(c4i_how_labour_started) & (is.na(c6c_delivery_by_caesarean_section) | c6c_delivery_by_caesarean_section==3)),TRUE,FALSE)) %>%
+    mutate(PARITET=case_when(
     parity==0 ~ 0,
     parity>0  ~ 1,
     TRUE ~ NA)
@@ -47,7 +46,7 @@ phen <- fread(opt$phen) %>%
   mutate(maternal_age2=maternal_age_at_delivery^2) %>%
   mutate(cidB4346= cidb4346) %>%
   mutate(GA=gestation_length*7,birth_weight=birthweight_from_notifications_or_clinical_records_grams) %>%
-  select(cidB4346,PARITET,maternal_age_at_delivery,maternal_age2,sex_assigned_at_birth,GA,birth_weight,iflivein1y,ifhealth,ifnottwins,ifnotART,ifspontaneous,ifnotCS) 
+  select(cidB4346,PARITET,maternal_age_at_delivery,maternal_age2,sex_assigned_at_birth,GA,birth_weight,iflivein1y,ifhealth,ifnottwins,ifnotART,ifspontaneous) 
 
 genoID<- fread(opt$genoID) %>%
   select(ID_2) 
@@ -61,8 +60,8 @@ linkfile$chip_f <- linkfile$gwa_550_g1
 getID <- function(traits,cohorts,genome){
               if (traits=="gd" & cohorts=="parity0" & genome=="Mother"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
-                  filter(GA>154 & GA<308 & PARITET==0) %>%
+                  filter(iflivein1y %in% TRUE & ifhealth %in% TRUE & ifnottwins %in% TRUE & ifnotART %in% TRUE & ifspontaneous %in% TRUE) %>%
+                  filter(!is.na(GA) & GA>154 & GA<308 & PARITET==0) %>%
                   inner_join(linkfile,by="cidB4346") %>%
                   inner_join(genoID,by=c("imputed_m"="ID_2")) %>%
                   mutate(imputedID=imputed_m,chipID=chip_m) %>%
@@ -70,7 +69,7 @@ getID <- function(traits,cohorts,genome){
                 
               }else if(traits=="gd" & cohorts=="parity1" & genome=="Mother"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
+                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T) %>%
                   filter(GA>154 & GA<308 & PARITET==1) %>%
                   inner_join(linkfile,by="cidB4346") %>%
                   inner_join(genoID,by=c("imputed_m"="ID_2")) %>%
@@ -79,8 +78,8 @@ getID <- function(traits,cohorts,genome){
                 
               }else if(traits=="gd" & cohorts=="parityall" & genome=="Mother"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
-                  filter(GA>154 & GA<308) %>%
+                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T) %>%
+                  filter(GA>154 & GA<308 & !is.na(PARITET)) %>%
                   inner_join(linkfile,by="cidB4346",relationship = "many-to-many") %>%
                   inner_join(genoID,by=c("imputed_m"="ID_2")) %>%
                   mutate(imputedID=imputed_m,chipID=chip_m) %>%
@@ -88,7 +87,7 @@ getID <- function(traits,cohorts,genome){
                 
               }else if(traits=="gd" & cohorts=="parity0" & genome=="Child"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
+                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T) %>%
                   filter(GA>154 & GA<308 & PARITET==0) %>%
                   inner_join(linkfile,by="cidB4346") %>%
                   inner_join(genoID,by=c("imputed_f"="ID_2")) %>%
@@ -96,7 +95,7 @@ getID <- function(traits,cohorts,genome){
                   select(cidB4346,imputedID,chipID)
               }else if(traits=="gd" & cohorts=="parity1" & genome=="Child"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
+                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T) %>%
                   filter(GA>154 & GA<308 & PARITET==1) %>%
                   inner_join(linkfile,by="cidB4346") %>%
                   inner_join(genoID,by=c("imputed_f"="ID_2")) %>%
@@ -104,8 +103,8 @@ getID <- function(traits,cohorts,genome){
                   select(cidB4346,imputedID,chipID) 
               }else if(traits=="gd" & cohorts=="parityall" & genome=="Child"){
                 ID <- phen %>%
-                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T & ifnotCS==T) %>%
-                  filter(GA>154 & GA<308) %>%
+                  filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T & ifspontaneous==T) %>%
+                  filter(GA>154 & GA<308 & !is.na(PARITET)) %>%
                   inner_join(linkfile,by="cidB4346",relationship = "many-to-many") %>%
                   inner_join(genoID,by=c("imputed_f"="ID_2")) %>%
                   mutate(imputedID=imputed_f,chipID=chip_f) %>%
@@ -137,7 +136,7 @@ getID <- function(traits,cohorts,genome){
               }else if(traits=="bw_zscore" & cohorts=="parityall" & genome=="Mother"){
                 ID <- phen %>%
                   filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T) %>%
-                  filter(GA>259 & GA<300 & birth_weight>0) %>%
+                  filter(GA>259 & GA<300 & !is.na(PARITET) & birth_weight>0) %>%
                   filter(
                     abs(birth_weight - mean(birth_weight, na.rm = TRUE)) <= 5 * sd(birth_weight, na.rm = TRUE)
                   ) %>%
@@ -171,7 +170,7 @@ getID <- function(traits,cohorts,genome){
               }else if(traits=="bw_zscore" & cohorts=="parityall" & genome=="Child"){
                 ID <- phen %>%
                   filter(iflivein1y==T & ifhealth==T & ifnottwins==T & ifnotART==T) %>%
-                  filter(GA>259 & GA<300 & birth_weight>0) %>%
+                  filter(GA>259 & GA<300 & !is.na(PARITET) & birth_weight>0) %>%
                   filter(
                     abs(birth_weight - mean(birth_weight, na.rm = TRUE)) <= 5 * sd(birth_weight, na.rm = TRUE)
                   ) %>%
